@@ -102,3 +102,7 @@ src/compile/            Planner and job builder
 src/metadata/           Titles, descriptions, disclosures
 test/                   Rule and pipeline tests
 ```
+
+## Runbook
+
+Step-by-step operating instructions — logging a clip, auditing, planning a cut, rendering and publishing — are in [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
