@@ -1,0 +1,21 @@
+{
+  "id": "gta6-compilations",
+  "displayName": "GTA VI Compilations",
+  "tone": ["high-energy", "fast-cut", "gaming", "hype-aware"],
+  "visualStyle": "Vice City neon, sunset pinks and teals, heavy contrast, punchy cuts on the beat.",
+  "defaultWatermark": "GTA VI Compilations",
+  "defaultCTA": "Subscribe for the next drop.",
+  "defaultCaptionStyle": "bold-creator",
+  "defaultHashtags": ["#Shorts", "#GTA6", "#GTAVI", "#ViceCity"],
+  "titleRules": [
+    "Never claim gameplay for footage that is not gameplay.",
+    "Lead with the moment, not the franchise name.",
+    "Keep it under 60 characters so it survives the mobile crop."
+  ],
+  "safetyNotes": [
+    "Every clip needs a traceable source before it can ship.",
+    "Fan-made and AI footage must carry a burned-in disclosure, not just a description line.",
+    "GTA VI releases 2026-11-19. Anything labeled player gameplay before that date is mislabeled.",
+    "Unofficial fan content. Grand Theft Auto VI is a trademark of Take-Two Interactive."
+  ]
+}

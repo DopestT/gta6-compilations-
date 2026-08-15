@@ -1,0 +1,106 @@
+{
+  "version": 1,
+  "updatedAt": "2026-08-14",
+  "clips": [
+    {
+      "id": "t2-chase-causeway",
+      "title": "Causeway pursuit at dusk",
+      "file": "clips/media/t2-chase-causeway.mp4",
+      "durationSeconds": 12,
+      "provenance": "official-rockstar",
+      "sourceUrl": "https://www.rockstargames.com/VI",
+      "creator": "Rockstar Games",
+      "capturedAt": "2025-05-06",
+      "tags": ["police chases", "trailer", "vice city"],
+      "status": "approved",
+      "notes": "Trailer 2 footage. Official promotional material."
+    },
+    {
+      "id": "t2-roadblock-swamp",
+      "title": "Roadblock break through the wetlands",
+      "file": "clips/media/t2-roadblock-swamp.mp4",
+      "durationSeconds": 9,
+      "provenance": "official-rockstar",
+      "sourceUrl": "https://www.rockstargames.com/VI",
+      "creator": "Rockstar Games",
+      "capturedAt": "2025-05-06",
+      "tags": ["police chases", "trailer"],
+      "status": "approved"
+    },
+    {
+      "id": "t1-boat-escape",
+      "title": "Boat escape through the marina",
+      "file": "clips/media/t1-boat-escape.mp4",
+      "durationSeconds": 11,
+      "provenance": "official-rockstar",
+      "sourceUrl": "https://www.rockstargames.com/VI",
+      "creator": "Rockstar Games",
+      "capturedAt": "2023-12-04",
+      "tags": ["police chases", "trailer", "vice city"],
+      "status": "approved",
+      "notes": "Trailer 1 footage."
+    },
+    {
+      "id": "t2-beach-strip-night",
+      "title": "Neon beach strip at night",
+      "file": "clips/media/t2-beach-strip-night.mp4",
+      "durationSeconds": 14,
+      "provenance": "official-rockstar",
+      "sourceUrl": "https://www.rockstargames.com/VI",
+      "creator": "Rockstar Games",
+      "capturedAt": "2025-05-06",
+      "tags": ["vice city", "trailer", "atmosphere"],
+      "status": "approved"
+    },
+    {
+      "id": "fan-vice-city-flythrough",
+      "title": "Vice City skyline flythrough concept",
+      "file": "clips/media/fan-vice-city-flythrough.mp4",
+      "durationSeconds": 18,
+      "provenance": "fan-made",
+      "sourceUrl": "https://example.com/creator/vice-city-concept",
+      "creator": "placeholder-creator",
+      "capturedAt": "2026-03-11",
+      "tags": ["vice city", "atmosphere"],
+      "status": "approved",
+      "notes": "Fan concept render. Carries a disclosure and is credited. Replace the placeholder source before publishing."
+    },
+    {
+      "id": "ai-dock-pov-first-third",
+      "title": "Dock walk POV comparison (AI render)",
+      "file": "clips/media/ai-dock-pov-first-third.mp4",
+      "durationSeconds": 8,
+      "provenance": "ai-generated",
+      "sourceUrl": "https://example.com/social/ai-dock-pov",
+      "creator": "unattributed social repost",
+      "capturedAt": "2026-08-07",
+      "tags": ["vice city", "atmosphere"],
+      "status": "review",
+      "notes": "Circulated with a GTA VI watermark as a first/third person comparison. GTA VI has no announced first-person mode and no gameplay had been shown as of this date. Photoreal AI render, not gameplay."
+    },
+    {
+      "id": "bad-unsourced-chase",
+      "title": "Insane police chase gameplay",
+      "file": "clips/media/bad-unsourced-chase.mp4",
+      "durationSeconds": 10,
+      "provenance": "unknown",
+      "capturedAt": "2026-06-02",
+      "tags": ["police chases"],
+      "status": "review",
+      "notes": "Reposted with no traceable origin. Held until the source is found."
+    },
+    {
+      "id": "bad-impossible-gameplay",
+      "title": "My first GTA VI playthrough",
+      "file": "clips/media/bad-impossible-gameplay.mp4",
+      "durationSeconds": 15,
+      "provenance": "user-gameplay",
+      "sourceUrl": "https://example.com/social/impossible-capture",
+      "creator": "unknown uploader",
+      "capturedAt": "2026-07-20",
+      "tags": ["police chases"],
+      "status": "review",
+      "notes": "Claims player-captured gameplay months before launch. Flagged automatically by the capture-date rule."
+    }
+  ]
+}
