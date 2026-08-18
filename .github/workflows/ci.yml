@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Typecheck
+        run: npx tsc -p tsconfig.json --noEmit
+
+      - name: Tests
+        run: npm test
+
+      # The provenance gate. Clips still in review may carry open problems —
+      # that is what review means. This fails only when a clip marked approved
+      # has a blocking issue, which means something untraceable or mislabeled
+      # is one merge away from being rendered into a video.
+      - name: Provenance gate
+        run: npm run gate

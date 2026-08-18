@@ -46,13 +46,34 @@ the label.
 
 ```bash
 npm install
+npm run ingest -- --url "https://www.rockstargames.com/VI" \
+  --file "clips/media/x.mp4" --title "Causeway pursuit" --tags "police chases"
 npm run audit                              # check every clip
+npm run gate                               # CI posture: approved clips only
 npm run dev -- plan --theme "police chases" --seconds 60
 npm run dev -- job  --theme "vice city"    --seconds 60
 npm test
 ```
 
-Flags: `--registry PATH`, `--max-clips N`, `--out PATH`.
+Flags: `--registry PATH`, `--max-clips N`, `--out PATH`. Run `npm run dev -- help` for the full list.
+
+## Ingest and trusted sources
+
+`ingest` resolves provenance from the source URL where the URL is proof on its own. A clip served
+from Rockstar's properties is official promotional material by definition, so it is logged as
+`official-rockstar`, credited, and approved without a human in the loop. Any other host requires an
+explicit `--provenance` and lands at `review` — the pipeline will not guess at the one decision it
+exists to get right.
+
+Duration is read with ffprobe when available, or supplied with `--duration N`.
+
+## CI
+
+`.github/workflows/ci.yml` runs typecheck, tests, and `npm run gate` on every pull request.
+
+The gate fails only on **approved** clips with blocking issues. A clip in `review` is work in
+progress and may legitimately have open problems; a clip marked `approved` is an assertion that it is
+clean, so an error there is a real defect. Rejected clips are skipped entirely.
 
 ## Registry
 

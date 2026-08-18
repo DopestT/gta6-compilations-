@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { AuditIssue } from "../types.js";
-import { auditRegistry, hasBlockingIssues } from "../provenance/rules.js";
+import { AuditIssue, Provenance } from "../types.js";
+import { auditRegistry, gatingIssues, hasBlockingIssues } from "../provenance/rules.js";
 import { defaultRegistryPath, loadRegistry, repoRoot } from "../registry/registry.js";
 import { planCompilation } from "../compile/planner.js";
 import { buildEngineJob } from "../compile/job.js";
+import { ingestClip } from "../ingest/ingest.js";
+import { trustedHosts } from "../ingest/trustedSources.js";
 
 interface Args {
   command: string;
@@ -14,6 +16,7 @@ interface Args {
   maxClips?: number;
   registry: string;
   out?: string;
+  flags: Map<string, string>;
 }
 
 function parseArgs(argv: string[]): Args {
@@ -44,6 +47,7 @@ function parseArgs(argv: string[]): Args {
     maxClips: maxClipsRaw ? Number(maxClipsRaw) : undefined,
     registry: flags.get("registry") ?? defaultRegistryPath,
     out: flags.get("out"),
+    flags,
   };
 }
 
@@ -70,10 +74,26 @@ async function main(): Promise<number> {
         "gta6 — provenance-gated compilation builder",
         "",
         "  audit                          Check every clip's provenance and labeling",
+        "  audit --gate                   Fail only on approved clips (used by CI)",
+        "  ingest --url U --file F ...    Add a clip, resolving provenance from the URL",
         "  plan  --theme T --seconds N    Show which clips a compilation would use",
         "  job   --theme T --seconds N    Write a youtubeengine job to out/",
         "",
         "Flags: --registry PATH  --max-clips N  --out PATH",
+        "",
+        "ingest flags:",
+        "  --url U         Source URL (required)",
+        "  --file F        Path to the media (required)",
+        "  --title T       Clip title (required)",
+        "  --tags a,b      Comma-separated tags",
+        "  --provenance P  Required unless the URL is a trusted source",
+        "  --creator C     Overrides the creator inferred from a trusted source",
+        "  --captured D    ISO capture date",
+        "  --duration N    Seconds, skipping the ffprobe read",
+        "  --id I          Explicit clip id",
+        "  --review        Hold a trusted clip at review instead of approving",
+        "",
+        `Trusted sources: ${trustedHosts().join(", ")}`,
       ].join("\n"),
     );
     return 0;
@@ -84,7 +104,58 @@ async function main(): Promise<number> {
   if (args.command === "audit") {
     const issues = auditRegistry(registry);
     printIssues(issues);
+
+    // --gate is the CI posture: clips still in review are expected to have
+    // open problems, so only a broken *approved* clip fails the build.
+    if (args.flags.has("gate")) {
+      const blocking = gatingIssues(registry, issues);
+      if (blocking.length > 0) {
+        console.log(`\nGate: ${blocking.length} error(s) on approved clips.`);
+        return 1;
+      }
+      console.log("\nGate: no errors on approved clips.");
+      return 0;
+    }
+
     return hasBlockingIssues(issues) ? 1 : 0;
+  }
+
+  if (args.command === "ingest") {
+    const url = args.flags.get("url");
+    const file = args.flags.get("file");
+    const title = args.flags.get("title");
+
+    if (!url || !file || !title) {
+      console.error("ingest requires --url, --file and --title.");
+      return 1;
+    }
+
+    const tagsRaw = args.flags.get("tags");
+    const durationRaw = args.flags.get("duration");
+    const provenanceRaw = args.flags.get("provenance");
+
+    const result = await ingestClip(args.registry, {
+      url,
+      file,
+      title,
+      tags: tagsRaw ? tagsRaw.split(",").map((t) => t.trim()).filter(Boolean) : [],
+      ...(provenanceRaw ? { provenance: provenanceRaw as Provenance } : {}),
+      ...(args.flags.get("creator") ? { creator: args.flags.get("creator") as string } : {}),
+      ...(args.flags.get("captured") ? { capturedAt: args.flags.get("captured") as string } : {}),
+      ...(durationRaw ? { durationSeconds: Number(durationRaw) } : {}),
+      ...(args.flags.get("id") ? { id: args.flags.get("id") as string } : {}),
+      ...(args.flags.has("review") ? { forceReview: true } : {}),
+    });
+
+    const { clip } = result;
+    console.log(`Added ${clip.id}`);
+    console.log(`  provenance: ${clip.provenance}${result.trusted ? " (from trusted source)" : ""}`);
+    console.log(`  duration:   ${clip.durationSeconds}s (${result.durationSource})`);
+    console.log(`  status:     ${clip.status}`);
+    if (clip.status === "review") {
+      console.log("\nHolding at review. Clear it with \"audit\", then set status to approved.");
+    }
+    return 0;
   }
 
   if (args.command === "plan" || args.command === "job") {
