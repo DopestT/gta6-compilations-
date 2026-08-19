@@ -116,6 +116,14 @@ export function auditClip(clip: Clip, releaseDate = GAME_RELEASE_DATE): AuditIss
   return issues;
 }
 
+/**
+ * Audit every clip that is still in play.
+ *
+ * Rejected clips are skipped: rejecting one is a decision already made, and
+ * the entry stays in the registry as the record of having looked at it. Their
+ * issues are exactly why they were rejected, so re-reporting them forever
+ * would make a well-kept registry noisier the longer you use it.
+ */
 export function auditRegistry(registry: Registry, releaseDate = GAME_RELEASE_DATE): AuditIssue[] {
   const issues: AuditIssue[] = [];
   const seen = new Set<string>();
@@ -130,6 +138,7 @@ export function auditRegistry(registry: Registry, releaseDate = GAME_RELEASE_DAT
       });
     }
     seen.add(clip.id);
+    if (clip.status === "rejected") continue;
     issues.push(...auditClip(clip, releaseDate));
   }
 
@@ -138,6 +147,21 @@ export function auditRegistry(registry: Registry, releaseDate = GAME_RELEASE_DAT
 
 export function hasBlockingIssues(issues: AuditIssue[]): boolean {
   return issues.some((i) => i.severity === "error");
+}
+
+/**
+ * The subset of issues that should fail a build.
+ *
+ * A clip in `review` is work in progress — errors on it are the normal state
+ * of tracing a clip down, not a broken repo. A clip marked `approved` is an
+ * assertion that it is clean, so an error there is a real defect and the only
+ * thing worth blocking a merge over.
+ */
+export function gatingIssues(registry: Registry, issues: readonly AuditIssue[]): AuditIssue[] {
+  const approved = new Set(
+    registry.clips.filter((c) => c.status === "approved").map((c) => c.id),
+  );
+  return issues.filter((i) => i.severity === "error" && approved.has(i.clipId));
 }
 
 /**

@@ -15,7 +15,29 @@ Node 20+. No other dependencies. ffmpeg is only needed later, by youtubeengine.
 
 ## Step 1 — You found a clip. Log it.
 
-Do **not** download it into the project yet. First answer one question: **where did this actually come from?**
+### Fast path: a trusted source
+
+If the clip comes from Rockstar's own properties, `ingest` handles it:
+
+```bash
+npm run ingest -- \
+  --url "https://www.rockstargames.com/VI" \
+  --file "clips/media/causeway-pursuit.mp4" \
+  --title "Causeway pursuit at dusk" \
+  --tags "police chases,trailer" \
+  --captured 2026-08-27
+```
+
+The domain settles the provenance, so the clip is logged as `official-rockstar`, credited to
+Rockstar Games, and goes straight to `approved` — there is no judgment left for you to make. Duration
+is read with ffprobe; pass `--duration N` if ffprobe isn't installed. Use `--review` to hold it back
+anyway.
+
+Run `npm run dev -- help` for the current trusted list.
+
+### Everything else: decide, then log
+
+Answer one question first: **where did this actually come from?**
 
 Pick the provenance honestly:
 
@@ -29,7 +51,17 @@ Pick the provenance honestly:
 
 `unknown` is a valid, useful answer. It parks the clip instead of guessing.
 
-Add the entry to `clips/registry.json`:
+`ingest` still does the mechanical part once you have made the call:
+
+```bash
+npm run ingest -- --url "https://..." --file "clips/media/x.mp4" \
+  --title "What happens" --provenance fan-made --tags "vice city"
+```
+
+It refuses to guess: an untrusted URL without `--provenance` is an error, and anything it logs this
+way lands at `review`.
+
+Or write the entry into `clips/registry.json` by hand:
 
 ```json
 {
@@ -72,6 +104,16 @@ Fix every **ERROR** before going further. What they mean:
 - **`mislabeled-as-gameplay`** — the title claims gameplay but the provenance says otherwise. Either the title is wrong or the provenance is. Fix whichever is actually false.
 
 **Warnings** are fine to ship with, but read them. `missing-creator` means the credit line will say "unknown creator" on a public video.
+
+Clips marked `rejected` are skipped — that decision is already made, and the entry stays as the record.
+
+### What CI checks
+
+CI runs `npm run gate`, which is the same audit with a narrower failure condition: it fails only when
+an **approved** clip has a blocking issue. Clips sitting in `review` with errors are the normal state
+of tracing something down and will not break the build. So `npm run audit` going red locally is
+expected while you work; `npm run gate` going red means something untraceable is one merge from being
+rendered.
 
 ---
 

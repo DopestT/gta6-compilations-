@@ -11,6 +11,8 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/cli/index.ts",
     "audit": "tsx src/cli/index.ts audit",
+    "gate": "tsx src/cli/index.ts audit --gate",
+    "ingest": "tsx src/cli/index.ts ingest",
     "plan": "tsx src/cli/index.ts plan",
     "job": "tsx src/cli/index.ts job",
     "test": "tsx --test test/*.test.ts"
